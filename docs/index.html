@@ -1,733 +1,162 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RayBox — Premium VPN Client</title>
-    <meta name="description" content="Premium, ultra-fast VPN client powered by Xray-core & sing-box. White-label branding support for Hiddify and 3x-ui.">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #050510;
-            --bg-card: rgba(15, 20, 40, 0.6);
-            --border: rgba(100, 130, 255, 0.15);
-            --border-glow: rgba(100, 130, 255, 0.5);
-            --text: #f8fafc;
-            --text-muted: #8b95b5;
-            --primary: #3b82f6;
-            --secondary: #a855f7;
-            --cyan: #06b6d4;
-            --pink: #ec4899;
-            --font-main: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html { scroll-behavior: smooth; }
-        
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-        
-        /* =========================================
-           RTX RAYS BACKGROUND LAYER
-           ========================================= */
-        .rtx-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        
-        /* Central rotating rays */
-        .rtx-rays {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 250vmax;
-            height: 250vmax;
-            transform: translate(-50%, -50%);
-            background: conic-gradient(from 0deg,
-                transparent 0deg,
-                rgba(59, 130, 246, 0.45) 12deg,
-                transparent 24deg,
-                transparent 80deg,
-                rgba(168, 85, 247, 0.4) 92deg,
-                transparent 104deg,
-                transparent 170deg,
-                rgba(6, 182, 212, 0.35) 182deg,
-                transparent 194deg,
-                transparent 260deg,
-                rgba(236, 72, 153, 0.3) 272deg,
-                transparent 284deg,
-                transparent 360deg
-            );
-            filter: blur(70px);
-            animation: spin 90s linear infinite;
-            opacity: 0.5;
-            will-change: transform;
-        }
-        
-        /* Pulsing central glow */
-        .rtx-glow {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 60%);
-            filter: blur(80px);
-            animation: pulse 5s ease-in-out infinite;
-            will-change: opacity, transform;
-        }
-        
-        /* Perspective grid floor */
-        .rtx-grid {
-            position: absolute;
-            bottom: -10vh;
-            left: -50vw;
-            right: -50vw;
-            height: 60vh;
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.35) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.35) 1px, transparent 1px);
-            background-size: 80px 80px;
-            transform: perspective(400px) rotateX(65deg);
-            transform-origin: center bottom;
-            mask-image: linear-gradient(to top, black 0%, transparent 80%);
-            -webkit-mask-image: linear-gradient(to top, black 0%, transparent 80%);
-            opacity: 0.6;
-        }
-        
-        /* Horizontal scan lines */
-        .rtx-scanlines {
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent 0px,
-                transparent 2px,
-                rgba(100, 130, 255, 0.02) 2px,
-                rgba(100, 130, 255, 0.02) 4px
-            );
-        }
-        
-        @keyframes spin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
-        }
-        
-        /* =========================================
-           CONTENT
-           ========================================= */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
-        
-        /* Header */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem 0;
-            background: rgba(5, 5, 16, 0.7);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.4rem;
-            letter-spacing: -0.02em;
-        }
-        
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            box-shadow: 0 0 24px rgba(59, 130, 246, 0.5);
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .nav-links a:hover {
-            color: var(--text);
-            text-shadow: 0 0 12px rgba(59, 130, 246, 0.8);
-        }
-        
-        /* Language switch */
-        .lang-switch {
-            display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            gap: 2px;
-        }
-        
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        
-        .lang-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
-        }
-        
-        .lang-btn:hover:not(.active) {
-            color: var(--text);
-        }
-        
-        /* =========================================
-           HERO
-           ========================================= */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 100px 20px 60px;
-            position: relative;
-        }
-        
-        .hero-content {
-            max-width: 900px;
-            animation: fadeIn 1s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid var(--border-glow);
-            border-radius: 100px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 2rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            box-shadow: 0 0 24px rgba(59, 130, 246, 0.2);
-        }
-        
-        .hero-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 12px var(--primary);
-            animation: pulse 2s infinite;
-        }
-        
-        .hero h1 {
-            font-size: clamp(2.5rem, 7vw, 5rem);
-            font-weight: 900;
-            line-height: 1.05;
-            letter-spacing: -0.04em;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 80px rgba(59, 130, 246, 0.4);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5));
-        }
-        
-        .hero p {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 3rem;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        /* =========================================
-           BUTTONS
-           ========================================= */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.7), inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border-glow);
-            transform: translateY(-2px);
-        }
-        
-        /* =========================================
-           FEATURES
-           ========================================= */
-        .section {
-            padding: 100px 20px;
-            position: relative;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 1rem;
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 4rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 2rem;
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-        
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--border-glow);
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.2);
-        }
-        
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6));
-        }
-        
-        .feature-card h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-        
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        /* =========================================
-           CTA SECTION
-           ========================================= */
-        .cta-section {
-            text-align: center;
-            padding: 100px 20px;
-        }
-        
-        .cta-card {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 60px 40px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 80px rgba(59, 130, 246, 0.15);
-        }
-        
-        .cta-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        
-        .cta-card h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
-        .cta-card p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            position: relative;
-        }
-        
-        .cta-card .btn {
-            position: relative;
-        }
-        
-        /* =========================================
-           FOOTER
-           ========================================= */
-        footer {
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            position: relative;
-            z-index: 1;
-        }
-        
-        footer a {
-            color: var(--text-muted);
-            text-decoration: none;
-            margin: 0 12px;
-            transition: color 0.2s;
-        }
-        
-        footer a:hover {
-            color: var(--primary);
-        }
-        
-        /* =========================================
-           LANGUAGE TOGGLE
-           ========================================= */
-        [data-lang]:not(.active) { display: none !important; }
-        .lang-inline[data-lang].active { display: inline !important; }
-        
-        /* =========================================
-           RESPONSIVE
-           ========================================= */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .rtx-rays { filter: blur(40px); opacity: 0.3; }
-            .rtx-glow { width: 500px; height: 500px; filter: blur(50px); }
-            .hero-buttons { flex-direction: column; align-items: stretch; }
-            .hero-buttons .btn { justify-content: center; }
-            .cta-card { padding: 40px 24px; }
-        }
-        
-        @media (prefers-reduced-motion: reduce) {
-            .rtx-rays, .rtx-glow { animation: none; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RayBox — VPN-клиент на лучах Xray</title>
+<meta name="description" content="RayBox: Android VPN-клиент на Xray-core и sing-box. XHTTP, Reality, честный пинг, white-label брендинг.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080f;--card:rgba(12,18,32,.62);--line:rgba(57,255,20,.16);--glow:rgba(57,255,20,.55);--text:#fff;--muted:#8b9bb4;--g:#39FF14;--c:#00E5FF}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,sans-serif;overflow-x:hidden}
+#rays{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vig{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,var(--bg) 100%)}
+header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(5,8,15,.6);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{max-width:1100px;margin:0 auto;padding:.8rem 20px;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.3rem;color:var(--text);text-decoration:none}
+.logo img{width:32px;height:32px;border-radius:8px}
+.links{display:flex;gap:1.8rem}
+.links a{color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s}
+.links a:hover{color:var(--g)}
+.lang{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:10px}
+.lang button{background:none;border:0;color:var(--muted);font:600 .78rem Inter,sans-serif;padding:5px 12px;border-radius:7px;cursor:pointer}
+.lang button.on{background:var(--g);color:#000}
+main{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px}
+.box{width:132px;height:132px;border-radius:26px;display:grid;place-items:center;background:rgba(5,8,15,.92);border:1px solid var(--glow);box-shadow:0 0 50px rgba(57,255,20,.25),inset 0 0 30px rgba(57,255,20,.08);margin-bottom:56px}
+.box img{width:84px;height:84px;border-radius:18px}
+h1{font-size:clamp(2.6rem,8vw,5.2rem);font-weight:900;line-height:1.02;letter-spacing:-.045em;text-shadow:0 0 40px var(--bg),0 0 12px var(--bg)}
+.grad{background:linear-gradient(120deg,var(--g),var(--c));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{max-width:620px;margin:1.4rem auto 2.4rem;color:#b3c0d4;font-size:clamp(1rem,2vw,1.2rem);text-shadow:0 0 12px var(--bg)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:12px;font:700 1rem Inter,sans-serif;text-decoration:none;transition:.25s}
+.btn.p{background:var(--g);color:#000;box-shadow:0 6px 30px rgba(57,255,20,.4)}
+.btn.p:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(57,255,20,.6)}
+.btn.s{color:var(--text);border:1px solid var(--line);background:rgba(255,255,255,.04);backdrop-filter:blur(8px)}
+.btn.s:hover{border-color:var(--glow);transform:translateY(-2px)}
+.tag{margin-top:2.2rem;font:400 .75rem 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.08em}
+.tag b{color:var(--g);font-weight:700}
+section.f{padding:90px 20px 110px;max-width:1100px;margin:0 auto}
+h2{text-align:center;font-size:clamp(1.8rem,4vw,2.7rem);font-weight:900;letter-spacing:-.03em;margin-bottom:3rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.card{position:relative;overflow:hidden;padding:2rem;border-radius:18px;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(16px);transition:.35s}
+.card::after{content:"";position:absolute;top:-60px;right:-60px;width:140px;height:140px;background:conic-gradient(from 200deg,transparent,rgba(57,255,20,.35),transparent 40%);filter:blur(18px);opacity:.5;transition:opacity .35s}
+.card:hover{transform:translateY(-5px);border-color:var(--glow)}
+.card:hover::after{opacity:1}
+.n{font:700 .8rem 'JetBrains Mono',monospace;color:var(--g);margin-bottom:1rem}
+.card h3{font-size:1.2rem;font-weight:800;margin-bottom:.6rem}
+.card p{color:var(--muted);font-size:.95rem}
+footer{position:relative;z-index:1;padding:32px 20px;text-align:center;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;background:rgba(5,8,15,.7)}
+footer a{color:var(--muted);text-decoration:none;margin:0 10px}
+footer a:hover{color:var(--g)}
+@media(max-width:700px){.links{display:none}.box{width:110px;height:110px;margin-bottom:44px}.box img{width:70px;height:70px}.btns{flex-direction:column;width:100%;max-width:320px}.btn{justify-content:center}}
+</style>
 </head>
 <body>
+<canvas id="rays"></canvas><div class="vig"></div>
 
-    <!-- RTX BACKGROUND LAYER -->
-    <div class="rtx-layer">
-        <div class="rtx-rays"></div>
-        <div class="rtx-glow"></div>
-        <div class="rtx-grid"></div>
-        <div class="rtx-scanlines"></div>
-    </div>
+<header><div class="nav">
+  <a class="logo" href="index.html"><img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" alt="">RayBox</a>
+  <nav class="links">
+    <a href="#features" data-i="nav1"></a>
+    <a href="generator.html" data-i="nav2"></a>
+    <a href="privacy.html" data-i="nav3"></a>
+    <a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div class="lang"><button data-l="ru">RU</button><button data-l="en">EN</button></div>
+</div></header>
 
-    <!-- HEADER -->
-    <header>
-        <div class="nav-container">
-            <div class="logo">
-                <div class="logo-icon">⚡</div>
-                RayBox
-            </div>
-            <nav class="nav-links">
-                <a href="#features" data-lang="ru" class="lang-inline active">Возможности</a>
-                <a href="#features" data-lang="en" class="lang-inline">Features</a>
-                <a href="generator.html" data-lang="ru" class="lang-inline active">Генератор</a>
-                <a href="generator.html" data-lang="en" class="lang-inline">Generator</a>
-                <a href="privacy.html" data-lang="ru" class="lang-inline active">Приватность</a>
-                <a href="privacy.html" data-lang="en" class="lang-inline">Privacy</a>
-                <a href="https://github.com/voidjd/raybox" target="_blank">GitHub</a>
-            </nav>
-            <div class="lang-switch">
-                <button class="lang-btn active" data-set-lang="ru">RU</button>
-                <button class="lang-btn" data-set-lang="en">EN</button>
-            </div>
-        </div>
-    </header>
+<main>
+<section class="hero">
+  <div class="box" id="box"><img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" alt="RayBox"></div>
+  <h1><span data-i="h1a"></span><br><span class="grad" data-i="h1b"></span></h1>
+  <p class="sub" data-i="sub"></p>
+  <div class="btns">
+    <a class="btn p" href="https://github.com/voidjd/raybox" data-i="dl"></a>
+    <a class="btn s" href="generator.html" data-i="gen"></a>
+  </div>
+  <div class="tag">RTX <b>ON</b> · XRAY-CORE · SING-BOX</div>
+</section>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span data-lang="ru" class="lang-inline active">Powered by Xray-core & sing-box</span>
-                <span data-lang="en" class="lang-inline">Powered by Xray-core & sing-box</span>
-            </div>
-            
-            <h1>
-                <span data-lang="ru" class="lang-inline active">Твой VPN.<br><span class="gradient-text">Твой Бренд.</span></span>
-                <span data-lang="en" class="lang-inline">Your VPN.<br><span class="gradient-text">Your Brand.</span></span>
-            </h1>
-            
-            <p>
-                <span data-lang="ru" class="lang-inline active">Премиальный Android-клиент с поддержкой XHTTP, Reality и White-label брендинга. Честный пинг, парсинг трафика и полная кастомизация из панели Hiddify или 3x-ui.</span>
-                <span data-lang="en" class="lang-inline">Premium Android client with XHTTP, Reality and White-label branding support. Honest ping, traffic parsing and full customization from the Hiddify or 3x-ui panel.</span>
-            </p>
-            
-            <div class="hero-buttons">
-                <a href="https://github.com/voidjd/raybox" class="btn btn-primary">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" /></svg>
-                    <span data-lang="ru" class="lang-inline active">Скачать на GitHub</span>
-                    <span data-lang="en" class="lang-inline">Get on GitHub</span>
-                </a>
-                <a href="generator.html" class="btn btn-secondary">
-                    <span data-lang="ru" class="lang-inline active">Открыть генератор</span>
-                    <span data-lang="en" class="lang-inline">Open generator</span>
-                </a>
-            </div>
-        </div>
-    </section>
+<section class="f" id="features">
+  <h2 data-i="why"></h2>
+  <div class="grid">
+    <div class="card"><div class="n">01</div><h3 data-i="f1t"></h3><p data-i="f1p"></p></div>
+    <div class="card"><div class="n">02</div><h3 data-i="f2t"></h3><p data-i="f2p"></p></div>
+    <div class="card"><div class="n">03</div><h3 data-i="f3t"></h3><p data-i="f3p"></p></div>
+  </div>
+</section>
+</main>
 
-    <!-- FEATURES -->
-    <section id="features" class="section">
-        <div class="container">
-            <h2 class="section-title">
-                <span data-lang="ru" class="lang-inline active">Почему <span class="gradient-text">RayBox</span>?</span>
-                <span data-lang="en" class="lang-inline">Why <span class="gradient-text">RayBox</span>?</span>
-            </h2>
-            <p class="section-subtitle">
-                <span data-lang="ru" class="lang-inline active">Технологии, которые работают. Даже там, где другие клиенты пасуют.</span>
-                <span data-lang="en" class="lang-inline">Technology that works. Even where other clients fail.</span>
-            </p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3>
-                        <span data-lang="ru" class="lang-inline active">White-label Брендинг</span>
-                        <span data-lang="en" class="lang-inline">White-label Branding</span>
-                    </h3>
-                    <p>
-                        <span data-lang="ru" class="lang-inline active">Меняйте логотип, название и иконки серверов прямо из панели Hiddify или 3x-ui. Приложение подхватит изменения автоматически.</span>
-                        <span data-lang="en" class="lang-inline">Change logo, title and node icons right from the Hiddify or 3x-ui panel. The app picks up changes automatically.</span>
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>
-                        <span data-lang="ru" class="lang-inline active">Честный пинг</span>
-                        <span data-lang="en" class="lang-inline">Honest Ping</span>
-                    </h3>
-                    <p>
-                        <span data-lang="ru" class="lang-inline active">Задержка тестируется через ядро Xray (URL-Test), а не через TCP-сокеты. Вы видите реальную скорость отклика сервера.</span>
-                        <span data-lang="en" class="lang-inline">Latency is tested through the Xray core (URL-Test), not TCP sockets. You see the real server response speed.</span>
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>
-                        <span data-lang="ru" class="lang-inline active">Умный трафик</span>
-                        <span data-lang="en" class="lang-inline">Smart Traffic</span>
-                    </h3>
-                    <p>
-                        <span data-lang="ru" class="lang-inline active">Клиент парсит заголовки subscription-userinfo и показывает остаток ГБ и дней. Полоса трафика в стиле Hiddify.</span>
-                        <span data-lang="en" class="lang-inline">Parses subscription-userinfo headers and displays remaining GB and days. Hiddify-style traffic bar.</span>
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>
-                        <span data-lang="ru" class="lang-inline active">XHTTP и Reality</span>
-                        <span data-lang="en" class="lang-inline">XHTTP & Reality</span>
-                    </h3>
-                    <p>
-                        <span data-lang="ru" class="lang-inline active">Полная поддержка современных транспортов Xray-core для обхода DPI. Работает даже там, где другие клиенты пасуют.</span>
-                        <span data-lang="en" class="lang-inline">Full support for modern Xray-core transports to bypass DPI. Works even where other clients fail.</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+<footer>
+  <p>© 2026 RayBox · Gravitek Software</p>
+  <p style="margin-top:.5rem"><a href="generator.html" data-i="nav2"></a><a href="privacy.html" data-i="nav3"></a><a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a></p>
+</footer>
 
-    <!-- CTA -->
-    <section class="cta-section">
-        <div class="cta-card">
-            <h2>
-                <span data-lang="ru" class="lang-inline active">Готовы попробовать?</span>
-                <span data-lang="en" class="lang-inline">Ready to try it?</span>
-            </h2>
-            <p>
-                <span data-lang="ru" class="lang-inline active">Откройте для себя VPN-клиент, который настраивается под ваш бренд.</span>
-                <span data-lang="en" class="lang-inline">Discover a VPN client that gets customized to your brand.</span>
-            </p>
-            <a href="https://github.com/voidjd/raybox" class="btn btn-primary">
-                <span data-lang="ru" class="lang-inline active">Перейти на GitHub</span>
-                <span data-lang="en" class="lang-inline">Go to GitHub</span>
-            </a>
-        </div>
-    </section>
+<script>
+const D={
+ru:{nav1:'Возможности',nav2:'Генератор',nav3:'Приватность',h1a:'Твой VPN.',h1b:'Твой свет.',
+sub:'Android-клиент на Xray-core и sing-box. Лучи проходят там, где другие клиенты упираются в стену.',
+dl:'Скачать на GitHub',gen:'Генератор',why:'Один луч — одна задача',
+f1t:'XHTTP и Reality',f1p:'Современные транспорты Xray-core для обхода DPI. Трафик выглядит как обычный HTTPS.',
+f2t:'Честный пинг',f2p:'Задержка измеряется через ядро (URL-Test), а не TCP-сокетом. Вы видите реальный отклик.',
+f3t:'Ваш бренд',f3p:'Логотип, название и иконки серверов задаются из панели Hiddify или 3x-ui. Остаток ГБ и дней показывается в приложении.'},
+en:{nav1:'Features',nav2:'Generator',nav3:'Privacy',h1a:'Your VPN.',h1b:'Your light.',
+sub:'Android client built on Xray-core and sing-box. Rays pass where other clients hit a wall.',
+dl:'Get on GitHub',gen:'Generator',why:'One ray, one job',
+f1t:'XHTTP & Reality',f1p:'Modern Xray-core transports to bypass DPI. Your traffic looks like ordinary HTTPS.',
+f2t:'Honest ping',f2p:'Latency is measured by the core (URL-Test), not a TCP socket. You see the real response time.',
+f3t:'Your brand',f3p:'Logo, title and node icons come from your Hiddify or 3x-ui panel. Remaining GB and days show in the app.'}};
+function setLang(l){
+  try{localStorage.setItem('raybox_lang',l)}catch(e){}
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=D[l][e.dataset.i]);
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+let saved='ru';try{saved=localStorage.getItem('raybox_lang')||'ru'}catch(e){}
+setLang(D[saved]?saved:'ru');
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <p>© 2026 RayBox. Open Source Project.</p>
-            <p style="margin-top: 0.75rem;">
-                <a href="generator.html" data-lang="ru" class="lang-inline active">Генератор</a>
-                <a href="generator.html" data-lang="en" class="lang-inline">Generator</a>
-                <a href="privacy.html" data-lang="ru" class="lang-inline active">Политика конфиденциальности</a>
-                <a href="privacy.html" data-lang="en" class="lang-inline">Privacy Policy</a>
-                <a href="https://github.com/voidjd/raybox" target="_blank">GitHub</a>
-            </p>
-        </div>
-    </footer>
-
-    <script>
-        function setLang(lang) {
-            localStorage.setItem('raybox_lang', lang);
-            document.documentElement.lang = lang;
-            
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                if (el.getAttribute('data-lang') === lang) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            });
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                if (btn.getAttribute('data-set-lang') === lang) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-        }
-        
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', () => setLang(btn.getAttribute('data-set-lang')));
-        });
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('raybox_lang') || 'ru';
-            setLang(saved);
-        });
-    </script>
+/* Ray casting: light source + the logo box as an obstacle */
+const cv=document.getElementById('rays'),cx=cv.getContext('2d'),box=document.getElementById('box');
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W,H,N,L={x:0,y:0},T={x:0,y:0},free=false,t=0;
+function size(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);N=W<700?150:260}
+size();addEventListener('resize',size);
+addEventListener('pointermove',e=>{free=true;T.x=e.clientX;T.y=e.clientY});
+function frame(){
+  t+=.006;
+  const r=box.getBoundingClientRect(),bx=r.left+r.width/2,by=r.top+r.height/2;
+  if(!free){T.x=bx+Math.cos(t)*Math.min(W*.4,520);T.y=by+Math.sin(t*1.3)*Math.min(H*.3,240)}
+  L.x+=(T.x-L.x)*.08;L.y+=(T.y-L.y)*.08;
+  cx.globalCompositeOperation='source-over';cx.clearRect(0,0,W,H);
+  cx.globalCompositeOperation='lighter';
+  const R=Math.hypot(W,H),inside=L.x>r.left&&L.x<r.right&&L.y>r.top&&L.y<r.bottom;
+  const pa=new Path2D(),pb=new Path2D(),hits=[];
+  for(let i=0;i<N;i++){
+    const a=i/N*Math.PI*2+t*.4,dx=Math.cos(a),dy=Math.sin(a);let len=R;
+    if(!inside){
+      const x1=(r.left-L.x)/dx,x2=(r.right-L.x)/dx,y1=(r.top-L.y)/dy,y2=(r.bottom-L.y)/dy;
+      const tn=Math.max(Math.min(x1,x2),Math.min(y1,y2)),tf=Math.min(Math.max(x1,x2),Math.max(y1,y2));
+      if(tf>=tn&&tn>0){len=tn;hits.push(L.x+dx*tn,L.y+dy*tn)}
+    }
+    const p=i%2?pa:pb;p.moveTo(L.x,L.y);p.lineTo(L.x+dx*len,L.y+dy*len);
+  }
+  cx.lineWidth=1.2;
+  cx.strokeStyle='rgba(57,255,20,.085)';cx.stroke(pa);
+  cx.strokeStyle='rgba(0,229,255,.07)';cx.stroke(pb);
+  cx.fillStyle='rgba(190,255,180,.55)';
+  for(let i=0;i<hits.length;i+=2)cx.fillRect(hits[i]-1,hits[i+1]-1,2,2);
+  const g=cx.createRadialGradient(L.x,L.y,0,L.x,L.y,170);
+  g.addColorStop(0,'rgba(220,255,210,.9)');g.addColorStop(.12,'rgba(57,255,20,.35)');g.addColorStop(1,'rgba(57,255,20,0)');
+  cx.fillStyle=g;cx.fillRect(L.x-170,L.y-170,340,340);
+  if(!still)requestAnimationFrame(frame);
+}
+frame();
+</script>
 </body>
 </html>
