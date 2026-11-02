@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RayBox — VPN-клиент на лучах Xray</title>
-<meta name="description" content="RayBox: Android VPN-клиент на Xray-core и sing-box. XHTTP, Reality, честный пинг, white-label брендинг.">
+<title>RayBox — Android-клиент на sing-box</title>
+<meta name="description" content="RayBox: Android-клиент на ядре sing-box. VLESS, VMess, Hysteria2, TUIC, XHTTP, раздельное проксирование и брендинг с сервера.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -50,6 +50,7 @@ h2{text-align:center;font-size:clamp(1.8rem,4vw,2.7rem);font-weight:900;letter-s
 .n{font:700 .8rem 'JetBrains Mono',monospace;color:var(--g);margin-bottom:1rem}
 .card h3{font-size:1.2rem;font-weight:800;margin-bottom:.6rem}
 .card p{color:var(--muted);font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:800px;margin:0 auto}.chip{padding:9px 18px;border:1px solid var(--line);border-radius:100px;background:var(--card);font:400 .85rem 'JetBrains Mono',monospace;color:#cfe;transition:.25s}.chip:hover{border-color:var(--glow);color:var(--g)}.chip.hl{border-color:var(--glow);color:var(--g)}.stk{text-align:center}.stk p{color:var(--muted);margin:-1.8rem 0 2rem}.disc{max-width:640px;margin:.9rem auto 0;font-size:.78rem;opacity:.75}
 footer{position:relative;z-index:1;padding:32px 20px;text-align:center;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;background:rgba(5,8,15,.7)}
 footer a{color:var(--muted);text-decoration:none;margin:0 10px}
 footer a:hover{color:var(--g)}
@@ -63,6 +64,7 @@ footer a:hover{color:var(--g)}
   <a class="logo" href="index.html"><img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" alt="">RayBox</a>
   <nav class="links">
     <a href="#features" data-i="nav1"></a>
+    <a href="#stack" data-i="nav4"></a>
     <a href="generator.html" data-i="nav2"></a>
     <a href="privacy.html" data-i="nav3"></a>
     <a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a>
@@ -79,7 +81,7 @@ footer a:hover{color:var(--g)}
     <a class="btn p" href="https://github.com/voidjd/raybox" data-i="dl"></a>
     <a class="btn s" href="generator.html" data-i="gen"></a>
   </div>
-  <div class="tag">RTX <b>ON</b> · XRAY-CORE · SING-BOX</div>
+  <div class="tag">RTX <b>ON</b> · SING-BOX · ANDROID 8.0+</div>
 </section>
 
 <section class="f" id="features">
@@ -88,6 +90,17 @@ footer a:hover{color:var(--g)}
     <div class="card"><div class="n">01</div><h3 data-i="f1t"></h3><p data-i="f1p"></p></div>
     <div class="card"><div class="n">02</div><h3 data-i="f2t"></h3><p data-i="f2p"></p></div>
     <div class="card"><div class="n">03</div><h3 data-i="f3t"></h3><p data-i="f3p"></p></div>
+    <div class="card"><div class="n">04</div><h3 data-i="f4t"></h3><p data-i="f4p"></p></div>
+    <div class="card"><div class="n">05</div><h3 data-i="f5t"></h3><p data-i="f5p"></p></div>
+    <div class="card"><div class="n">06</div><h3 data-i="f6t"></h3><p data-i="f6p"></p></div>
+  </div>
+</section>
+
+<section class="f stk" id="stack">
+  <h2 data-i="stk"></h2>
+  <p data-i="stkp"></p>
+  <div class="chips">
+    <span class="chip hl">sing-box (libbox)</span><span class="chip">Kotlin</span><span class="chip">Material 3</span><span class="chip">ViewBinding</span><span class="chip">Coroutines &amp; Flow</span><span class="chip">ZXing QR</span><span class="chip">Android 8.0+</span><span class="chip">RU · EN · 中文 · فارسی · AZ · العربية</span>
   </div>
 </section>
 </main>
@@ -95,22 +108,33 @@ footer a:hover{color:var(--g)}
 <footer>
   <p>© 2026 RayBox · Gravitek Software</p>
   <p style="margin-top:.5rem"><a href="generator.html" data-i="nav2"></a><a href="privacy.html" data-i="nav3"></a><a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a></p>
+  <p class="disc" data-i="disc"></p>
 </footer>
 
 <script>
 const D={
-ru:{nav1:'Возможности',nav2:'Генератор',nav3:'Приватность',h1a:'Твой VPN.',h1b:'Твой свет.',
-sub:'Android-клиент на Xray-core и sing-box. Лучи проходят там, где другие клиенты упираются в стену.',
+ru:{nav1:'Возможности',nav2:'Генератор',nav3:'Приватность',nav4:'Стек',h1a:'Твой VPN.',h1b:'Твой свет.',
+sub:'Android-клиент на ядре sing-box. Вставьте подписку, нажмите кнопку и подключайтесь к своим серверам. Оформление приходит с сервера.',
 dl:'Скачать на GitHub',gen:'Генератор',why:'Один луч — одна задача',
-f1t:'XHTTP и Reality',f1p:'Современные транспорты Xray-core для обхода DPI. Трафик выглядит как обычный HTTPS.',
-f2t:'Честный пинг',f2p:'Задержка измеряется через ядро (URL-Test), а не TCP-сокетом. Вы видите реальный отклик.',
-f3t:'Ваш бренд',f3p:'Логотип, название и иконки серверов задаются из панели Hiddify или 3x-ui. Остаток ГБ и дней показывается в приложении.'},
-en:{nav1:'Features',nav2:'Generator',nav3:'Privacy',h1a:'Your VPN.',h1b:'Your light.',
-sub:'Android client built on Xray-core and sing-box. Rays pass where other clients hit a wall.',
+f1t:'Протоколы и транспорты',f1p:'VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP. Транспорты: WebSocket, gRPC, HTTPUpgrade, XHTTP.',
+f2t:'Оформление с сервера',f2p:'Название, логотип, имена и иконки узлов приходят в подписке. Пересобирать APK не нужно.',
+f3t:'Подписка под контролем',f3p:'Остаток трафика и срока из subscription-userinfo, автообновление раз в 6, 12 или 24 часа, импорт по QR.',
+f4t:'Раздельное проксирование',f4p:'Выбирайте приложения, которые идут через клиент, и назначайте каждому свой узел.',
+f5t:'DNS и правила',f5p:'Отдельные DNS для proxy и direct, блокировка рекламы, прямой доступ к локальной сети, обновляемые наборы правил.',
+f6t:'Всё на виду',f6p:'Активные соединения, журнал, диагностика ядра. IP-адреса в интерфейсе можно маскировать.',
+stk:'Под капотом',stkp:'Нативное Android-приложение без обёрток.',
+disc:'RayBox — только клиент. Серверы и подписки не предоставляются. Вы отвечаете за соблюдение законов своей страны.'},
+en:{nav1:'Features',nav2:'Generator',nav3:'Privacy',nav4:'Stack',h1a:'Your VPN.',h1b:'Your light.',
+sub:'Android client built on the sing-box core. Paste a subscription, tap connect and use your own servers. The look comes from the server.',
 dl:'Get on GitHub',gen:'Generator',why:'One ray, one job',
-f1t:'XHTTP & Reality',f1p:'Modern Xray-core transports to bypass DPI. Your traffic looks like ordinary HTTPS.',
-f2t:'Honest ping',f2p:'Latency is measured by the core (URL-Test), not a TCP socket. You see the real response time.',
-f3t:'Your brand',f3p:'Logo, title and node icons come from your Hiddify or 3x-ui panel. Remaining GB and days show in the app.'}};
+f1t:'Protocols & transports',f1p:'VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP. Transports: WebSocket, gRPC, HTTPUpgrade, XHTTP.',
+f2t:'Server-side branding',f2p:'Title, logo, node names and icons arrive with the subscription. No APK rebuild needed.',
+f3t:'Subscription control',f3p:'Remaining traffic and days from subscription-userinfo, auto-update every 6, 12 or 24 hours, QR import.',
+f4t:'Per-app routing',f4p:'Pick which apps go through the client and assign each one its own node.',
+f5t:'DNS & rules',f5p:'Separate DNS for proxy and direct, ad blocking, direct LAN access, updatable rule sets.',
+f6t:'Full visibility',f6p:'Live connections, logs, core diagnostics. IP addresses can be masked in the UI.',
+stk:'Under the hood',stkp:'A native Android app, no wrappers.',
+disc:'RayBox is a client only. No servers or subscriptions are provided. You are responsible for complying with the laws of your country.'}};
 function setLang(l){
   try{localStorage.setItem('raybox_lang',l)}catch(e){}
   document.documentElement.lang=l;
