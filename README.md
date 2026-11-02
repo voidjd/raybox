@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://i.ibb.co/fzr9mNRT/Picsart-26-11-02-12-07-58-510.jpg" width="112" alt="RayBox">
+<img src="https://i.ibb.co/fzr9mNRT/Picsart-26-11-02-12-07-58-510.jpg" width="980" alt="RayBox">
 
 # RayBox
 
