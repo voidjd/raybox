@@ -1,280 +1,186 @@
-<div align="center">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RayBox — Android-клиент на sing-box</title>
+<meta name="description" content="RayBox: Android-клиент на ядре sing-box. VLESS, VMess, Hysteria2, TUIC, XHTTP, раздельное проксирование и брендинг с сервера.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080f;--card:rgba(12,18,32,.62);--line:rgba(57,255,20,.16);--glow:rgba(57,255,20,.55);--text:#fff;--muted:#8b9bb4;--g:#39FF14;--c:#00E5FF}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,sans-serif;overflow-x:hidden}
+#rays{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vig{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,var(--bg) 100%)}
+header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(5,8,15,.6);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{max-width:1100px;margin:0 auto;padding:.8rem 20px;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.3rem;color:var(--text);text-decoration:none}
+.logo img{width:32px;height:32px;border-radius:8px}
+.links{display:flex;gap:1.8rem}
+.links a{color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s}
+.links a:hover{color:var(--g)}
+.lang{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:10px}
+.lang button{background:none;border:0;color:var(--muted);font:600 .78rem Inter,sans-serif;padding:5px 12px;border-radius:7px;cursor:pointer}
+.lang button.on{background:var(--g);color:#000}
+main{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px}
+.box{width:132px;height:132px;border-radius:26px;display:grid;place-items:center;background:rgba(5,8,15,.92);border:1px solid var(--glow);box-shadow:0 0 50px rgba(57,255,20,.25),inset 0 0 30px rgba(57,255,20,.08);margin-bottom:56px}
+.box img{width:84px;height:84px;border-radius:18px}
+h1{font-size:clamp(2.6rem,8vw,5.2rem);font-weight:900;line-height:1.02;letter-spacing:-.045em;text-shadow:0 0 40px var(--bg),0 0 12px var(--bg)}
+.grad{background:linear-gradient(120deg,var(--g),var(--c));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{max-width:620px;margin:1.4rem auto 2.4rem;color:#b3c0d4;font-size:clamp(1rem,2vw,1.2rem);text-shadow:0 0 12px var(--bg)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:12px;font:700 1rem Inter,sans-serif;text-decoration:none;transition:.25s}
+.btn.p{background:var(--g);color:#000;box-shadow:0 6px 30px rgba(57,255,20,.4)}
+.btn.p:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(57,255,20,.6)}
+.btn.s{color:var(--text);border:1px solid var(--line);background:rgba(255,255,255,.04);backdrop-filter:blur(8px)}
+.btn.s:hover{border-color:var(--glow);transform:translateY(-2px)}
+.tag{margin-top:2.2rem;font:400 .75rem 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.08em}
+.tag b{color:var(--g);font-weight:700}
+section.f{padding:90px 20px 110px;max-width:1100px;margin:0 auto}
+h2{text-align:center;font-size:clamp(1.8rem,4vw,2.7rem);font-weight:900;letter-spacing:-.03em;margin-bottom:3rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.card{position:relative;overflow:hidden;padding:2rem;border-radius:18px;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(16px);transition:.35s}
+.card::after{content:"";position:absolute;top:-60px;right:-60px;width:140px;height:140px;background:conic-gradient(from 200deg,transparent,rgba(57,255,20,.35),transparent 40%);filter:blur(18px);opacity:.5;transition:opacity .35s}
+.card:hover{transform:translateY(-5px);border-color:var(--glow)}
+.card:hover::after{opacity:1}
+.n{font:700 .8rem 'JetBrains Mono',monospace;color:var(--g);margin-bottom:1rem}
+.card h3{font-size:1.2rem;font-weight:800;margin-bottom:.6rem}
+.card p{color:var(--muted);font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:800px;margin:0 auto}.chip{padding:9px 18px;border:1px solid var(--line);border-radius:100px;background:var(--card);font:400 .85rem 'JetBrains Mono',monospace;color:#cfe;transition:.25s}.chip:hover{border-color:var(--glow);color:var(--g)}.chip.hl{border-color:var(--glow);color:var(--g)}.stk{text-align:center}.stk p{color:var(--muted);margin:-1.8rem 0 2rem}.disc{max-width:640px;margin:.9rem auto 0;font-size:.78rem;opacity:.75}
+footer{position:relative;z-index:1;padding:32px 20px;text-align:center;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;background:rgba(5,8,15,.7)}
+footer a{color:var(--muted);text-decoration:none;margin:0 10px}
+footer a:hover{color:var(--g)}
+@media(max-width:700px){.links{display:none}.box{width:110px;height:110px;margin-bottom:44px}.box img{width:70px;height:70px}.btns{flex-direction:column;width:100%;max-width:320px}.btn{justify-content:center}}
+</style>
+</head>
+<body>
+<canvas id="rays"></canvas><div class="vig"></div>
 
-<img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" width="112" alt="RayBox">
+<header><div class="nav">
+  <a class="logo" href="index.html"><img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" alt="">RayBox</a>
+  <nav class="links">
+    <a href="#features" data-i="nav1"></a>
+    <a href="#stack" data-i="nav4"></a>
+    <a href="generator.html" data-i="nav2"></a>
+    <a href="privacy.html" data-i="nav3"></a>
+    <a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div class="lang"><button data-l="ru">RU</button><button data-l="en">EN</button></div>
+</div></header>
 
-# RayBox
+<main>
+<section class="hero">
+  <div class="box" id="box"><img src="https://lh3.googleusercontent.com/x3xqbrd21ip2u-2XtyUAwkU764M59cudCIGw4F4nj6J2f9YJi2HYcFL9oX4Xl3-v1cnY7dH_InR1u3ONVLsOLwY" alt="RayBox"></div>
+  <h1><span data-i="h1a"></span><br><span class="grad" data-i="h1b"></span></h1>
+  <p class="sub" data-i="sub"></p>
+  <div class="btns">
+    <a class="btn p" href="https://github.com/voidjd/raybox" data-i="dl"></a>
+    <a class="btn s" href="generator.html" data-i="gen"></a>
+  </div>
+  <div class="tag">RTX <b>ON</b> · SING-BOX · ANDROID 8.0+</div>
+</section>
 
-**Сетевой клиент для Android на ядре sing-box с брендингом, который настраивается на стороне сервера.**
+<section class="f" id="features">
+  <h2 data-i="why"></h2>
+  <div class="grid">
+    <div class="card"><div class="n">01</div><h3 data-i="f1t"></h3><p data-i="f1p"></p></div>
+    <div class="card"><div class="n">02</div><h3 data-i="f2t"></h3><p data-i="f2p"></p></div>
+    <div class="card"><div class="n">03</div><h3 data-i="f3t"></h3><p data-i="f3p"></p></div>
+    <div class="card"><div class="n">04</div><h3 data-i="f4t"></h3><p data-i="f4p"></p></div>
+    <div class="card"><div class="n">05</div><h3 data-i="f5t"></h3><p data-i="f5p"></p></div>
+    <div class="card"><div class="n">06</div><h3 data-i="f6t"></h3><p data-i="f6p"></p></div>
+  </div>
+</section>
 
-[![Release](https://img.shields.io/github/v/release/voidjd/raybox?style=for-the-badge&color=39FF14&labelColor=080C14)](https://github.com/voidjd/raybox/releases)
-[![Android](https://img.shields.io/badge/Android-8.0%2B-00E5FF?style=for-the-badge&labelColor=080C14&logo=android&logoColor=white)](#)
-[![License](https://img.shields.io/badge/License-MIT-39FF14?style=for-the-badge&labelColor=080C14)](LICENSE)
+<section class="f stk" id="stack">
+  <h2 data-i="stk"></h2>
+  <p data-i="stkp"></p>
+  <div class="chips">
+    <span class="chip hl">sing-box (libbox)</span><span class="chip">Kotlin</span><span class="chip">Material 3</span><span class="chip">ViewBinding</span><span class="chip">Coroutines &amp; Flow</span><span class="chip">ZXing QR</span><span class="chip">Android 8.0+</span><span class="chip">RU · EN · 中文 · فارسی · AZ · العربية</span>
+  </div>
+</section>
+</main>
 
-[Возможности](#возможности) · [Как это работает](#как-это-работает) · [Генератор](#генератор-конфигурации) · [Что читает приложение](#что-читает-приложение) · [Hiddify](#настройка-hiddify-manager) · [3x-ui / Marzban](#настройка-3x-ui-и-marzban) · [Сборка](#сборка) · [English](#english)
+<footer>
+  <p>© 2026 RayBox · Gravitek Software</p>
+  <p style="margin-top:.5rem"><a href="generator.html" data-i="nav2"></a><a href="privacy.html" data-i="nav3"></a><a href="https://github.com/voidjd/raybox" target="_blank" rel="noopener">GitHub</a></p>
+  <p class="disc" data-i="disc"></p>
+</footer>
 
-</div>
+<script>
+const D={
+ru:{nav1:'Возможности',nav2:'Генератор',nav3:'Приватность',nav4:'Стек',h1a:'Твой VPN.',h1b:'Твой свет.',
+sub:'Android-клиент на ядре sing-box. Вставьте подписку, нажмите кнопку и подключайтесь к своим серверам. Оформление приходит с сервера.',
+dl:'Скачать на GitHub',gen:'Генератор',why:'Один луч — одна задача',
+f1t:'Протоколы и транспорты',f1p:'VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP. Транспорты: WebSocket, gRPC, HTTPUpgrade, XHTTP.',
+f2t:'Оформление с сервера',f2p:'Название, логотип, имена и иконки узлов приходят в подписке. Пересобирать APK не нужно.',
+f3t:'Подписка под контролем',f3p:'Остаток трафика и срока из subscription-userinfo, автообновление раз в 6, 12 или 24 часа, импорт по QR.',
+f4t:'Раздельное проксирование',f4p:'Выбирайте приложения, которые идут через клиент, и назначайте каждому свой узел.',
+f5t:'DNS и правила',f5p:'Отдельные DNS для proxy и direct, блокировка рекламы, прямой доступ к локальной сети, обновляемые наборы правил.',
+f6t:'Всё на виду',f6p:'Активные соединения, журнал, диагностика ядра. IP-адреса в интерфейсе можно маскировать.',
+stk:'Под капотом',stkp:'Нативное Android-приложение без обёрток.',
+disc:'RayBox — только клиент. Серверы и подписки не предоставляются. Вы отвечаете за соблюдение законов своей страны.'},
+en:{nav1:'Features',nav2:'Generator',nav3:'Privacy',nav4:'Stack',h1a:'Your VPN.',h1b:'Your light.',
+sub:'Android client built on the sing-box core. Paste a subscription, tap connect and use your own servers. The look comes from the server.',
+dl:'Get on GitHub',gen:'Generator',why:'One ray, one job',
+f1t:'Protocols & transports',f1p:'VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP. Transports: WebSocket, gRPC, HTTPUpgrade, XHTTP.',
+f2t:'Server-side branding',f2p:'Title, logo, node names and icons arrive with the subscription. No APK rebuild needed.',
+f3t:'Subscription control',f3p:'Remaining traffic and days from subscription-userinfo, auto-update every 6, 12 or 24 hours, QR import.',
+f4t:'Per-app routing',f4p:'Pick which apps go through the client and assign each one its own node.',
+f5t:'DNS & rules',f5p:'Separate DNS for proxy and direct, ad blocking, direct LAN access, updatable rule sets.',
+f6t:'Full visibility',f6p:'Live connections, logs, core diagnostics. IP addresses can be masked in the UI.',
+stk:'Under the hood',stkp:'A native Android app, no wrappers.',
+disc:'RayBox is a client only. No servers or subscriptions are provided. You are responsible for complying with the laws of your country.'}};
+function setLang(l){
+  try{localStorage.setItem('raybox_lang',l)}catch(e){}
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=D[l][e.dataset.i]);
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+let saved='ru';try{saved=localStorage.getItem('raybox_lang')||'ru'}catch(e){}
+setLang(D[saved]?saved:'ru');
 
----
-
-## О проекте
-
-RayBox — клиент для подключения к **вашим собственным серверам** или серверам, к которым у вас есть легальный доступ. Вставили ссылку подписки, нажали кнопку, подключились. Без мастеров настройки и лишних экранов.
-
-Главная идея: **оформление приложения задаёт сервер, а не сборка**. Владелец сервиса меняет название, логотип, имена и иконки узлов прямо в панели, и клиент подхватывает это при обновлении подписки. Перекомпилировать APK не нужно.
-
-> **Важно.** RayBox — только программа-клиент. Она не предоставляет серверы, подписки и конфигурации, не продаёт и не рекомендует VPN-провайдеров. Вы сами отвечаете за то, к каким серверам подключаетесь, и за соблюдение законов своей страны. Подробности — в [политике конфиденциальности](https://voidjd.github.io/raybox/privacy.html).
-
-## Возможности
-
-| | Возможность | Что внутри |
-|---|---|---|
-| 🎨 | **Брендинг с сервера** | Название, логотип, имена и иконки узлов приходят из подписки |
-| 📊 | **Данные подписки** | Остаток трафика и срок действия из заголовка `subscription-userinfo` |
-| 🔗 | **Протоколы** | VLESS, VMess, Trojan, Shadowsocks, ShadowsocksR, Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP |
-| 🚚 | **Транспорты** | TCP, WebSocket, gRPC, HTTP, HTTPUpgrade, XHTTP |
-| 📥 | **Импорт** | Ссылка подписки, Base64, Clash YAML, sing-box и V2Ray JSON, отдельные ссылки, QR-код |
-| 🔄 | **Автообновление** | Вручную или каждые 6 / 12 / 24 часа |
-| 🧩 | **Раздельное проксирование** | Режим «только выбранные» или «все, кроме выбранных». Для каждого приложения можно назначить свой узел |
-| 🌐 | **DNS** | Отдельные адреса для proxy- и direct-трафика, стратегия `ipv4_only` / `prefer_ipv4` / `ipv4_and_ipv6` |
-| 🔁 | **Задержка и автопереключение** | Проверка задержки узлов, сортировка по ней, автоматическая смена узла при сбое или заметном замедлении |
-| 🔍 | **Соединения и диагностика** | Список активных соединений с поиском, журнал, версия ядра, статус наборов правил |
-| 🙈 | **Маскирование IP в интерфейсе** | Адреса серверов скрываются на экранах и в журнале (`1.2.**.**`). Это только отображение, трафик оно не меняет |
-| 🚩 | **Флаги стран** | Определяются по имени узла и домену |
-| 🌍 | **Языки** | Русский, English, 简体中文, فارسی, Azərbaycanca, العربية |
-| 🎛 | **Прочее** | Светлая, тёмная и системная темы, блокировка рекламы, прямой доступ к локальной сети, подсказки по энергосбережению, проверка обновлений |
-
-## Как это работает
-
-```text
-┌─────────────────┐     ┌────────────────────────┐     ┌──────────────────┐
-│ 1. Генератор    │ ──▶ │ 2. Панель / сервер     │ ──▶ │ 3. RayBox        │
-│ generator.html  │     │ Hiddify, 3x-ui, Marzban│     │ Android-клиент   │
-│                 │     │                        │     │                  │
-│ имена, иконки,  │     │ добавляет к ответу     │     │ читает заголовки │
-│ скрытые узлы    │     │ подписки заголовок     │     │ и перерисовывает │
-│ → JSON          │     │ profile-config         │     │ интерфейс        │
-└─────────────────┘     └────────────────────────┘     └──────────────────┘
-```
-
-1. Вы собираете JSON в генераторе (работает полностью в браузере, ничего никуда не отправляется).
-2. Сервер отдаёт этот JSON в заголовке `profile-config` вместе с подпиской.
-3. Приложение при обновлении подписки читает заголовки и применяет оформление.
-
-## Генератор конфигурации
-
-Страница [`generator.html`](https://voidjd.github.io/raybox/generator.html) (в репозитории — папка `web/`) превращает список узлов подписки в готовый JSON.
-
-**Как пользоваться**
-
-1. Откройте подписку (в браузере или через `curl`) и скопируйте её текст целиком. Подойдёт список ссылок `vless://…` или Base64-блок.
-2. Вставьте текст в поле «Вставьте текст подписки» и нажмите **«Распарсить»**. В таблице появятся все найденные узлы.
-3. Для каждого узла настройте:
-   - **Вкл** — снимите галочку, чтобы скрыть узел из подписки;
-   - **Имя** — новое отображаемое название (по умолчанию оригинальное);
-   - **Иконка** — прямая ссылка `https://…` на изображение (PNG, лучше квадратное).
-4. Справа появится JSON. Нажмите **«Копировать JSON»**.
-5. Вставьте JSON в панель (см. разделы про [Hiddify](#настройка-hiddify-manager) и [3x-ui / Marzban](#настройка-3x-ui-и-marzban)).
-
-**Как узел получает идентификатор**
-
-Каждый узел определяется по хешу **SHA-256 от ссылки без части после `#`** (то есть без названия). Поэтому:
-
-- имя узла на сервере можно менять свободно, привязка иконки и своего названия не сломается;
-- если изменить хост, порт, UUID или другие параметры, хеш станет другим, и узел придётся настроить в генераторе заново.
-
-**Что получится на выходе**
-
-```json
-{
-  "visibility": true,
-  "hidden_names": ["Старое имя узла"],
-  "nodes": {
-    "3f2a9c…(sha256)": {
-      "name": "🇩🇪 Frankfurt",
-      "icon_url": "https://example.com/de.png"
+/* Ray casting: light source + the logo box as an obstacle */
+const cv=document.getElementById('rays'),cx=cv.getContext('2d'),box=document.getElementById('box');
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W,H,N,L={x:0,y:0},T={x:0,y:0},free=false,t=0;
+function size(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);N=W<700?150:260}
+size();addEventListener('resize',size);
+addEventListener('pointermove',e=>{free=true;T.x=e.clientX;T.y=e.clientY});
+function frame(){
+  t+=.006;
+  const r=box.getBoundingClientRect(),bx=r.left+r.width/2,by=r.top+r.height/2;
+  if(!free){T.x=bx+Math.cos(t)*Math.min(W*.4,520);T.y=by+Math.sin(t*1.3)*Math.min(H*.3,240)}
+  L.x+=(T.x-L.x)*.08;L.y+=(T.y-L.y)*.08;
+  cx.globalCompositeOperation='source-over';cx.clearRect(0,0,W,H);
+  cx.globalCompositeOperation='lighter';
+  const R=Math.hypot(W,H),inside=L.x>r.left&&L.x<r.right&&L.y>r.top&&L.y<r.bottom;
+  const pa=new Path2D(),pb=new Path2D(),hits=[];
+  for(let i=0;i<N;i++){
+    const a=i/N*Math.PI*2+t*.4,dx=Math.cos(a),dy=Math.sin(a);let len=R;
+    if(!inside){
+      const x1=(r.left-L.x)/dx,x2=(r.right-L.x)/dx,y1=(r.top-L.y)/dy,y2=(r.bottom-L.y)/dy;
+      const tn=Math.max(Math.min(x1,x2),Math.min(y1,y2)),tf=Math.min(Math.max(x1,x2),Math.max(y1,y2));
+      if(tf>=tn&&tn>0){len=tn;hits.push(L.x+dx*tn,L.y+dy*tn)}
     }
+    const p=i%2?pa:pb;p.moveTo(L.x,L.y);p.lineTo(L.x+dx*len,L.y+dy*len);
   }
+  cx.lineWidth=1.2;
+  cx.strokeStyle='rgba(57,255,20,.085)';cx.stroke(pa);
+  cx.strokeStyle='rgba(0,229,255,.07)';cx.stroke(pb);
+  cx.fillStyle='rgba(190,255,180,.55)';
+  for(let i=0;i<hits.length;i+=2)cx.fillRect(hits[i]-1,hits[i+1]-1,2,2);
+  const g=cx.createRadialGradient(L.x,L.y,0,L.x,L.y,170);
+  g.addColorStop(0,'rgba(220,255,210,.9)');g.addColorStop(.12,'rgba(57,255,20,.35)');g.addColorStop(1,'rgba(57,255,20,0)');
+  cx.fillStyle=g;cx.fillRect(L.x-170,L.y-170,340,340);
+  if(!still)requestAnimationFrame(frame);
 }
-```
-
-| Поле | Назначение | Кто обрабатывает |
-|---|---|---|
-| `visibility` | `false` отключает выдачу узлов (подписка получает заглушку) | шаблон сервера |
-| `hidden_names` | Имена узлов, которые нужно убрать из выдачи | шаблон сервера |
-| `nodes` | Свои имена и иконки по хешу узла | **приложение** (через `profile-config`) |
-
-## Что читает приложение
-
-### Тело подписки
-
-Формат определяется автоматически. Поддерживаются:
-
-| Формат | Протоколы |
-|---|---|
-| Список ссылок или Base64 | `vless://`, `vmess://`, `hysteria2://` (`hy2://`), `tuic://`, `anytls://`, `ss://`, `ssr://`, `trojan://`, `socks5://`, `http(s)://` |
-| Clash YAML (`proxies:`) | ss, ssr, vmess, vless, hysteria2, tuic, trojan, socks5, http |
-| sing-box JSON (`outbounds`) | vmess, vless, hysteria2, tuic, shadowsocks, anytls, trojan, socks, http |
-| V2Ray / Xray JSON | vmess, vless, trojan, shadowsocks, socks, http |
-
-Reality, WebSocket, gRPC, HTTP/2 и HTTPUpgrade читаются из всех форматов. XHTTP распознаётся в ссылках `vless://`, `vmess://` и `trojan://`. Серверные конфигурации (с `inbounds`) приложение отклоняет с понятным сообщением. Узлы, которые нельзя безопасно перенести в sing-box (например, Hysteria2 с obfs), помечаются как неподдерживаемые.
-
-### Данные подписки
-
-Из заголовка `subscription-userinfo` приложение берёт `upload`, `download`, `total` и `expire` и показывает остаток трафика и дней. Поддерживаются безлимитные по трафику и по сроку подписки.
-
-### Оформление и маршрутизация (`profile-config`)
-
-Настройки читаются из одного из двух источников:
-
-1. HTTP-заголовок ответа `profile-config`;
-2. строка в теле подписки, начинающаяся с `#profile-config:` (так делает шаблон Hiddify ниже).
-
-Значением может быть обычный JSON или JSON в Base64. Ключи принимаются и в `camelCase`, и в `snake_case`.
-
-```json
-{
-  "branding": { "title": "My VPN", "avatar": "https://example.com/logo.png" },
-  "global_settings": { "hide_ip": true, "show_flags": false },
-  "routing": {
-    "direct_geosite": [], "direct_geoip": [], "block_geosite": [],
-    "direct_domains": [], "block_domains": [], "proxy_domains": []
-  },
-  "nodes": {
-    "<sha256 узла>": { "name": "Имя", "icon_url": "https://example.com/icon.png" }
-  }
-}
-```
-
-| Ключ | Значение |
-|---|---|
-| `branding.title` | Название сервиса в приложении |
-| `branding.avatar` | Логотип сервиса (URL) |
-| `global_settings.hide_ip` | Маскировать IP-адреса в интерфейсе |
-| `global_settings.show_flags` | Показывать флаги стран рядом с узлами |
-| `routing.*_geosite`, `*_geoip` | Категории наборов правил: напрямую / блокировать |
-| `routing.direct_domains`, `block_domains`, `proxy_domains` | Списки доменов: напрямую / блокировать / через узел |
-| `nodes` | Свои имя и иконка (`icon_url`, `iconUrl` или `icon`) по хешу узла |
-
-Если `profile-config` нет, приложение работает со стандартным оформлением.
-
-### Наборы правил
-
-В приложение встроены наборы правил sing-box (реклама, Apple, Google, Telegram, GitHub и географические списки). Раз в неделю, а также вручную из «Диагностики», они обновляются из репозитория [KaringX/karing-ruleset](https://github.com/KaringX/karing-ruleset). Файлы проверяются на формат и размер, замена атомарная, при ошибке выполняется откат.
-
-## Настройка Hiddify Manager
-
-Hiddify поддерживает шаблоны Jinja2, поэтому он подходит лучше всего.
-
-**1. Параметры домена.** В панели откройте `Настройки → Домены → Дополнительно` и вставьте JSON из генератора.
-
-**2. Шаблон.** Откройте `Редактор прокси → Шаблоны → Client Sublink Base`, включите **«Переопределить»** и **«Включено»** и вставьте шаблон ниже. Замените `brand_title` и `brand_avatar` на свои.
-
-<details>
-<summary><b>Шаблон Jinja2</b></summary>
-
-```jinja2
-{# {{ links }} #}
-{%- if not ctx.for_parent %}
-{% include 'sublink/subscription_header' %}
-
-{% set extra = {} %}
-{% if ctx.proxy and ctx.proxy.domains and ctx.proxy.domains[0].extra_params %}
-    {% set extra = ctx.proxy.domains[0].extra_params %}
-{% endif %}
-
-{% set visibility = extra.get('visibility', true) %}
-{% set custom_nodes = extra.get('nodes', {}) %}
-{% set hidden_names = extra.get('hidden_names', []) %}
-
-{% set brand_title = "My VPN" %}
-{% set brand_avatar = "https://example.com/logo.png" %}
-
-#profile-title: {{ brand_title }}
-#profile-config: {{ {"branding": {"title": brand_title, "avatar": brand_avatar}, "global_settings": {"hide_ip": true, "show_flags": false}, "routing": {}, "nodes": custom_nodes} | tojson }}
-{%- endif %}
-
-{%- if ctx.user.is_active %}
-{% if visibility %}
-{%- for t in (links | default('')).split('\n') %}
-{%- set ns = namespace(skip=false) %}
-{%- for h in hidden_names %}
-{%- if h and h in t %}
-{%- set ns.skip = true %}
-{%- endif %}
-{%- endfor %}
-{%- if t.strip() and not ns.skip %}
-{{ t.strip() }}
-{%- endif %}
-{%- endfor %}
-{% else %}
-# Subscription Disabled
-{% endif %}
-{%- endif %}
-```
-</details>
-
-**3.** Нажмите **«Сохранить»**, затем **«Применить»**. В приложении обновите подписку.
-
-## Настройка 3x-ui и Marzban
-
-В этих панелях нет шаблонизатора, поэтому заголовки добавляются на уровне обратного прокси. Запрос подписки проходит через Nginx, который дописывает `profile-title` и `profile-config`.
-
-<details>
-<summary><b>Пример конфигурации Nginx</b></summary>
-
-```nginx
-location /sub/ {
-    proxy_pass http://127.0.0.1:2096;   # порт подписок вашей панели
-
-    add_header profile-title "My VPN" always;
-    add_header profile-config '{"branding":{"title":"My VPN","avatar":"https://example.com/logo.png"},"global_settings":{"hide_ip":true},"nodes":{"<sha256>":{"name":"Frankfurt","icon_url":"https://example.com/de.png"}}}' always;
-}
-```
-</details>
-
-Замечания:
-
-- JSON в `add_header` должен быть **в одну строку** и в одинарных кавычках;
-- заголовок `subscription-userinfo` панель обычно отдаёт сама, Nginx его не трогает;
-- скрытие узлов (`hidden_names`) в этой схеме недоступно, так как фильтровать тело ответа Nginx сам не умеет. Просто не включайте лишние узлы в панели;
-- после правки выполните `nginx -t && systemctl reload nginx`.
-
-## Сборка
-
-| | |
-|---|---|
-| Язык | Kotlin |
-| Ядро | [sing-box](https://github.com/SagerNet/sing-box) через `libbox` |
-| UI | Material 3, ViewBinding, RecyclerView |
-| Асинхронность | Kotlin Coroutines, Flow |
-| Сканер QR | ZXing (journeyapps) |
-| Минимальная версия | Android 8.0 |
-
-```bash
-git clone https://github.com/voidjd/raybox.git
-cd raybox
-./gradlew assembleRelease
-```
-
-## Участие в проекте
-
-Pull request'ы приветствуются: форк → ветка `feature/…` → коммит → pull request. Перед отправкой убедитесь, что проект собирается.
-
-## Лицензия
-
-[MIT](LICENSE). Разработчик: Gravitek Software.
-
----
-
-## English
-
-**RayBox** is an Android network client built on the **sing-box** core. Paste a subscription link and connect. Its main feature is **server-side branding**: the service owner sets the app title, logo, node names and node icons from their panel, and the client applies them on the next subscription update. No APK rebuild is needed.
-
-- **Protocols:** VLESS, VMess, Trojan, Shadowsocks(R), Hysteria2, TUIC, AnyTLS, SOCKS5, HTTP
-- **Transports:** TCP, WebSocket, gRPC, HTTP, HTTPUpgrade, XHTTP
-- **Subscription data:** remaining traffic and days from the `subscription-userinfo` header
-- **Branding:** read from the `profile-config` response header (see [format](#что-читает-приложение))
-- **Per-app routing, custom DNS, connection viewer, diagnostics, 6 languages**
-- **Config generator:** `generator.html` builds the JSON locally in your browser (nodes are identified by the SHA-256 of their URI without the `#name` part)
-
-RayBox is a client only. It does not provide servers, subscriptions or configurations, and does not endorse any provider. You are responsible for the servers you connect to and for complying with the laws that apply to you.
+frame();
+</script>
+</body>
+</html>
